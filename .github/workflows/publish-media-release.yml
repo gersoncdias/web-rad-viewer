@@ -1,0 +1,70 @@
+name: Publish media viewer release
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: ID da execução do build concluído
+        required: true
+        type: string
+      tag:
+        description: Tag nova para a versão (ex. viewer-v1.0.0-rc.1)
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_ID: ${{ inputs.run_id }}
+      RELEASE_TAG: ${{ inputs.tag }}
+
+    steps:
+      - name: Validar build e identificar commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api "repos/$GH_REPO/actions/runs/$RUN_ID" > run.json
+
+          python3 - <<'PY'
+          import json
+          import os
+
+          with open("run.json") as f:
+              run = json.load(f)
+
+          if run["conclusion"] != "success":
+              raise SystemExit("O build precisa ter concluído com sucesso.")
+
+          if run["path"] != ".github/workflows/build-media-viewer.yml":
+              raise SystemExit("A execução não pertence ao workflow de build do MEDIA.")
+
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write(f'BUILD_SHA={run["head_sha"]}\n')
+          PY
+
+      - name: Recuperar pacote existente
+        run: |
+          gh run download "$RUN_ID" \
+            --name web-rad-viewer-media \
+            --dir package
+
+      - name: Conferir integridade
+        working-directory: package
+        run: sha256sum --check web-rad-viewer-media.zip.sha256
+
+      - name: Criar rascunho da release com os pacotes
+        run: |
+          gh release create "$RELEASE_TAG" \
+            package/web-rad-viewer-media.zip \
+            package/web-rad-viewer-media.zip.sha256 \
+            --target "$BUILD_SHA" \
+            --title "WebRad Viewer $RELEASE_TAG" \
+            --notes "Pacote do visualizador para integração com WEB-RAD MEDIA. Build de origem: https://github.com/$GH_REPO/actions/runs/$RUN_ID" \
+            --draft
