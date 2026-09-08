@@ -9,7 +9,7 @@ PACKAGE=YES
 
 # The JDK modules and the launch options are defined in launch-options.sh, shared with the
 # GitHub workflow building the macOS and Windows installers.
-NAME="Weasis"
+NAME="WebRad Viewer"
 IDENTIFIER="org.weasis.launcher"
 
 # Aux functions:
