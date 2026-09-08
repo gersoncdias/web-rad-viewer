@@ -13,6 +13,8 @@ jobs:
           distribution: temurin
           java-version: '25'
           cache: maven
+      - name: Test packaging scripts
+        run: python3 scripts/test-build-media-viewer.py
       - run: mvn -B clean install
       - run: mvn -B -f weasis-distributions/pom.xml clean package -PcompressXZ
       - uses: actions/upload-artifact@v4
@@ -46,10 +48,16 @@ jobs:
         with:
           name: native-payload
           path: payload
-      - shell: bash
+      - name: Extract native payload
+        shell: bash
+        run: unzip -q payload/weasis-native.zip -d payload/extracted
+      - name: Build native archive
+        shell: bash
+        env:
+          EXPECTED_ARCH: ${{ matrix.arch }}
         run: |
-          unzip -q payload/weasis-native.zip -d payload/extracted
           bash scripts/build-media-viewer.sh payload/extracted native-output
+          test -s "native-output/$EXPECTED_ARCH.zip"
       - uses: actions/upload-artifact@v4
         with:
           name: viewer-${{ matrix.arch }}
