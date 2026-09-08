@@ -38,8 +38,12 @@ public class DicomExplorerFactory implements DataExplorerViewFactory {
       explorer = new DicomExplorer(model);
       model.addPropertyChangeListener(explorer);
       List<Toolbar> toolbar = GuiUtils.getUICore().getExplorerPluginToolbars();
-      toolbar.add(new ImportToolBar(5, explorer));
-      toolbar.add(new ExportToolBar(7, explorer));
+      if (GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.import.dicom", true)) {
+        toolbar.add(new ImportToolBar(5, explorer));
+      }
+      if (GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.export.dicom", true)) {
+        toolbar.add(new ExportToolBar(7, explorer));
+      }
       ViewerPluginBuilder.DefaultDataModel.firePropertyChange(
           new ObservableEvent(ObservableEvent.BasicAction.NULL_SELECTION, explorer, null, null));
     }

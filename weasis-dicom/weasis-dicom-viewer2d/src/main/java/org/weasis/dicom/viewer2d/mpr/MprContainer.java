@@ -212,10 +212,16 @@ public class MprContainer extends DicomViewerPlugin
       Optional<Toolbar> viewBar =
           View2dContainer.UI.toolBars.stream().filter(ViewerToolBar.class::isInstance).findFirst();
       viewBar.ifPresent(toolBars::add);
-      toolBars.add(new MeasureToolBar(evtMg, 11));
+      boolean simple =
+          GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.ui.simple", false);
+      if (!simple) {
+        toolBars.add(new MeasureToolBar(evtMg, 11));
+      }
       toolBars.add(new ZoomToolBar(evtMg, 20, true));
-      toolBars.add(new RotationToolBar(evtMg, 30));
-      toolBars.add(new DcmHeaderToolBar(evtMg, 35));
+      if (!simple) {
+        toolBars.add(new RotationToolBar(evtMg, 30));
+        toolBars.add(new DcmHeaderToolBar(evtMg, 35));
+      }
       toolBars.add(new LutToolBar(evtMg, 40));
 
       final BundleContext context = AppProperties.getBundleContext(this.getClass());

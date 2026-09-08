@@ -763,6 +763,9 @@ public class WeasisWin {
     JMenuBar menuBar = new JMenuBar();
     buildMenuFile();
     menuBar.add(menuFile);
+    if (GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.ui.simple", false)) {
+      return menuBar;
+    }
     buildMenuView();
     menuBar.add(menuView);
     menuBar.add(menuSelectedPlugin);
@@ -1122,79 +1125,97 @@ public class WeasisWin {
 
   private void buildMenuFile() {
     menuFile.removeAll();
-    DynamicMenu openMenu =
-        new DynamicMenu(Messages.getString("WeasisWin.open")) {
+    if (GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.ui.simple", false)
+        && GuiUtils.getUICore()
+            .getSystemPreferences()
+            .getBooleanProperty("weasis.import.dicom", true)) {
+      DynamicMenu importMenu =
+          new DynamicMenu(Messages.getString("WeasisWin.import")) {
 
-          @Override
-          public void popupMenuWillBecomeVisible() {
-            buildOpenSubMenu(this);
-          }
-        };
-    openMenu.addPopupMenuListener();
-    menuFile.add(openMenu);
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildImportSubMenu(this);
+            }
+          };
+      importMenu.addPopupMenuListener();
+      menuFile.add(importMenu);
+      menuFile.add(new JSeparator());
+    }
+    if (!GuiUtils.getUICore().getSystemPreferences().getBooleanProperty("weasis.ui.simple", false)) {
+      DynamicMenu openMenu =
+          new DynamicMenu(Messages.getString("WeasisWin.open")) {
 
-    DynamicMenu importMenu =
-        new DynamicMenu(Messages.getString("WeasisWin.import")) {
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildOpenSubMenu(this);
+            }
+          };
+      openMenu.addPopupMenuListener();
+      menuFile.add(openMenu);
 
-          @Override
-          public void popupMenuWillBecomeVisible() {
-            buildImportSubMenu(this);
-          }
-        };
-    importMenu.addPopupMenuListener();
-    menuFile.add(importMenu);
+      DynamicMenu importMenu =
+          new DynamicMenu(Messages.getString("WeasisWin.import")) {
 
-    DynamicMenu exportMenu =
-        new DynamicMenu(Messages.getString("WeasisWin.export")) {
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildImportSubMenu(this);
+            }
+          };
+      importMenu.addPopupMenuListener();
+      menuFile.add(importMenu);
 
-          @Override
-          public void popupMenuWillBecomeVisible() {
-            buildExportSubMenu(this);
-          }
-        };
-    exportMenu.addPopupMenuListener();
+      DynamicMenu exportMenu =
+          new DynamicMenu(Messages.getString("WeasisWin.export")) {
 
-    menuFile.add(exportMenu);
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildExportSubMenu(this);
+            }
+          };
+      exportMenu.addPopupMenuListener();
 
-    DynamicMenu launcherMenu =
-        new DynamicMenu(Messages.getString("launcher")) {
+      menuFile.add(exportMenu);
 
-          @Override
-          public void popupMenuWillBecomeVisible() {
-            buildLauncherSubMenu(this);
-          }
-        };
-    launcherMenu.addPopupMenuListener();
+      DynamicMenu launcherMenu =
+          new DynamicMenu(Messages.getString("launcher")) {
 
-    menuFile.add(launcherMenu);
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildLauncherSubMenu(this);
+            }
+          };
+      launcherMenu.addPopupMenuListener();
 
-    menuFile.add(new JSeparator());
-    DynamicMenu printMenu =
-        new DynamicMenu(Messages.getString("WeasisWin.print")) {
+      menuFile.add(launcherMenu);
 
-          @Override
-          public void popupMenuWillBecomeVisible() {
-            buildPrintSubMenu(this);
-          }
-        };
-    printMenu.addPopupMenuListener();
-    menuFile.add(printMenu);
+      menuFile.add(new JSeparator());
+      DynamicMenu printMenu =
+          new DynamicMenu(Messages.getString("WeasisWin.print")) {
 
-    menuFile.add(new JSeparator());
-    Consumer<ActionEvent> prefAction =
-        e -> {
-          ColorLayerUI layer = ColorLayerUI.createTransparentLayerUI(getRootPaneContainer());
-          PreferenceDialog dialog = new PreferenceDialog(getFrame());
-          ColorLayerUI.showCenterScreen(dialog, layer);
-        };
-    DefaultAction preferencesAction =
-        new DefaultAction(
-            org.weasis.core.Messages.getString("OpenPreferencesAction.title"), prefAction);
-    preferencesAction.putValue(
-        Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
-    menuFile.add(new JMenuItem(preferencesAction));
+            @Override
+            public void popupMenuWillBecomeVisible() {
+              buildPrintSubMenu(this);
+            }
+          };
+      printMenu.addPopupMenuListener();
+      menuFile.add(printMenu);
 
-    menuFile.add(new JSeparator());
+      menuFile.add(new JSeparator());
+      Consumer<ActionEvent> prefAction =
+          e -> {
+            ColorLayerUI layer = ColorLayerUI.createTransparentLayerUI(getRootPaneContainer());
+            PreferenceDialog dialog = new PreferenceDialog(getFrame());
+            ColorLayerUI.showCenterScreen(dialog, layer);
+          };
+      DefaultAction preferencesAction =
+          new DefaultAction(
+              org.weasis.core.Messages.getString("OpenPreferencesAction.title"), prefAction);
+      preferencesAction.putValue(
+          Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_P, InputEvent.ALT_DOWN_MASK));
+      menuFile.add(new JMenuItem(preferencesAction));
+
+      menuFile.add(new JSeparator());
+    }
     DefaultAction exitAction =
         new DefaultAction(
             Messages.getString("ExitAction.title"),
