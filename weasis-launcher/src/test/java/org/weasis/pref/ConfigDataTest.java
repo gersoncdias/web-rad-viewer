@@ -51,8 +51,8 @@ class ConfigDataTest {
         () -> assertNull(configData.getProperty("user.home")), // NON-NLS
         () -> assertNull(configData.getProperty("java.io.tmpdir")), // NON-NLS
         () -> assertNotEquals("/tmp/attacker", System.getProperty("user.home")), // NON-NLS
-        // A folder name containing a path separator falls back to the configured default
-        () -> assertEquals("default", configData.getProperty(ConfigData.P_WEASIS_PROFILE)),
+        // A folder name containing a path separator falls back to the configured Lite profile
+        () -> assertEquals("lite-dvd", configData.getProperty(ConfigData.P_WEASIS_PROFILE)),
         // Documented launch properties are still applied, without mangling the non-ASCII letters
         () ->
             assertEquals(
