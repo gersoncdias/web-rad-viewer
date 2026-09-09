@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - 'v*'
+      # Media packages have their own release workflow.
+      - '!viewer-*'
 # Least privilege: the job commits CHANGELOG.md and creates a release (contents: write)
 # and the generator reads closed issues / merged PRs.
 permissions:
@@ -23,6 +25,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           compareLink: true
+          # HISTORY.md belongs to upstream Weasis and references tags absent in this fork.
+          base: /dev/null
           # Get config from .github_changelog_generator file
       - name: Git Auto Commit
         id: commit
