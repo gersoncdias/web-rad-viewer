@@ -254,20 +254,6 @@
       "category": "FELIX_INSTALL"
     },
     {
-      "code": "felix.auto.start.100",
-      "value": "file:${maven.localRepository}/org/weasis/base/weasis-base-viewer2d/${app.version}/weasis-base-viewer2d-${app.version}.jar",
-      "description": "Viewer 2D for standard images",
-      "type": "A",
-      "category": "FELIX_INSTALL"
-    },
-    {
-      "code": "felix.auto.start.110",
-      "value": "file:${maven.localRepository}/org/weasis/dicom/weasis-dicom-isowriter/${app.version}/weasis-dicom-isowriter-${app.version}.jar file:${maven.localRepository}/org/weasis/dicom/weasis-dicom-qr/${app.version}/weasis-dicom-qr-${app.version}.jar",
-      "description": "DICOM Q/R and ISO writer",
-      "type": "A",
-      "category": "FELIX_INSTALL"
-    },
-    {
       "code": "felix.log.level",
       "value": "2",
       "description": "Set the logging levels for OSGI framework  0=None / 1(default)=Error / 2=Warning / 3=Information / 4=Debug",
