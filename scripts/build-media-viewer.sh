@@ -20,6 +20,31 @@ mkdir -p "$job/payload/licenses"
 cp "$script_dir/../.."/LICENSE* "$script_dir/../../3rd-party-licenses.md" "$job/payload/licenses/"
 # A fresh private payload is used for each architecture.
 find "$job/payload/bundle" -name 'weasis-opencv-core-*' ! -name "*-$arch-*" -delete
+
+# Keep the embedded media package focused on DVD/offline DICOM viewing.
+# These modules are for Dicomizer, DICOM send, non-DICOM browsing, or an
+# interactive shell and are not used by the generated media launcher.
+find "$job/payload/bundle" -type f \( \
+  -name 'weasis-acquire-*' -o \
+  -name 'weasis-base-explorer-*' -o \
+  -name 'weasis-dicom-send-*' -o \
+  -name 'org.apache.felix.gogo.shell-*' \
+\) -delete
+rm -f "$job/payload/conf/dicomizer.json" \
+  "$job/payload/conf/non-dicom-explorer.json" \
+  "$job/payload/conf/base-shell.json"
+rm -rf "$job/payload/resources/isowriter"
+
+if [[ -d "$job/payload/bundle-i18n" ]]; then
+  find "$job/payload/bundle-i18n" -type f -name '*.jar.xz' ! \( \
+    -name 'weasis-core-i18n.jar.xz' -o \
+    -name 'weasis-base-ui-i18n.jar.xz' -o \
+    -name 'weasis-dicom-codec-i18n.jar.xz' -o \
+    -name 'weasis-dicom-explorer-i18n.jar.xz' -o \
+    -name 'weasis-dicom-viewer2d-i18n.jar.xz' \
+  \) -delete
+fi
+
 # Bash 3.2 (macOS) treats an empty array as unset with nounset enabled.
 # Keep the argument array populated even when there is no custom icon.
 package_options=(--type app-image)
